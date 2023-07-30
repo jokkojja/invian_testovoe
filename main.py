@@ -45,15 +45,33 @@ async def get_status(task_id):
 
 @app.get("/get_bbox/{task_id}")
 async def get_bbox(task_id):
-    pass
-
-@app.get("/get_predicted_image{task_id}")
-async def get_predicted_image(task_id):
-    pass
+    try:
+        bbox = get_bbox_of_process(task_id)
+        response = {'bbox': bbox}
+        return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
+    except Exception as e:
+        response = {'error': e}
+        return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_400_BAD_REQUEST)
+    
+@app.get("/get_processed_image{task_id}")
+async def get_processed_image(task_id):
+    try:
+        image = get_processed_image(task_id)
+        response = {'processedImage': image}
+        return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
+    except Exception as e:
+        response = {'error': e}
+        return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_400_BAD_REQUEST)    
 
 @app.get("/get_bbox_max/{task_id}")
 async def get_bbox_max(task_id):
-    pass
+    try:
+        bbox = get_max_bbox(task_id)
+        response = {'bbox': bbox}
+        return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
+    except Exception as e:
+        response = {'error': e}
+        return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_400_BAD_REQUEST)
 
 @app.post("/send_image")
 async def task_processing(file: bytes = File(...)):
@@ -61,7 +79,7 @@ async def task_processing(file: bytes = File(...)):
     # TODO: add image validation process
     task_id = str(uuid.uuid4())
     try:
-        create_object(task_id, str(file))
+        create_object(task_id, file)
     # TODO: update task db: processing
         asyncio.create_task(process_image(file, model, task_id))
     except Exception as e:

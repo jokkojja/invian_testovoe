@@ -7,7 +7,7 @@ load_dotenv()
 
 #config params
 TTL = 0
-MIN_TRESHHOLD = 0.5
+MIN_TRESHHOLD = 0.2
 NMS = 0
 
 #database

@@ -6,12 +6,16 @@ from my_utils.database import *
 from my_utils.config import MIN_TRESHHOLD
 
 def get_model():
-    model = torch.hub.load('./yolov5', 'custom', path='./models/best.pt', source='local')
-    model.conf = MIN_TRESHHOLD
+    try:
+        model = torch.hub.load('./yolov5', 'custom', path='./models/best.pt', source='local')
+        model.conf = MIN_TRESHHOLD
+    except Exception as e:
+        #TODO: process error
+        pass
     return model
 
 def get_image_from_bytes(binary_image, max_size=1024):
-    input_image =Image.open(io.BytesIO(binary_image)).convert("RGB")
+    input_image = Image.open(io.BytesIO(binary_image)).convert("RGB")
     width, height = input_image.size
     resize_factor = min(max_size / width, max_size / height)
     resized_image = input_image.resize((
@@ -21,12 +25,21 @@ def get_image_from_bytes(binary_image, max_size=1024):
     return resized_image
 
 async def process_image(file, model, task_id):
-    input_image = get_image_from_bytes(file)
-    results = model(input_image)
-    #TODO: add valid values of bbox
-    detect_res = results.pandas().xyxy[0].to_json(orient="records")  # JSON img1 predictions
-    detect_res = json.loads(detect_res)
-    #TODO: Add processing of empty result
-    print(detect_res)
-    add_processsing_results(task_id, detect_res)
+    try:
+        input_image = get_image_from_bytes(file)
+        results = model(input_image)
+        #TODO: add valid values of bbox
+        detect_res = results.pandas().xywhn[0].reset_index().to_dict(orient="records") #TODO: speed up, pandas is slow
+        processed_image = results.render()[0].tobytes()
+        max_confidence_bbox = max(detect_res, key=lambda x: x['confidence'])
+        if detect_res == []:
+            #TODO: Add processing of empty result
+            pass
+        else:
+            pass
+        add_processsing_results(task_id, detect_res, processed_image, max_confidence_bbox)
+    except Exception as e:
+        #TODO: Process errors
+        change_status(task_id, status='error')
+        pass
     # update task: finished and coords of detecting
