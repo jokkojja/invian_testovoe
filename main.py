@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import Response, JSONResponse
 from fastapi.exceptions import RequestValidationError
-from my_utils.model import get_model, get_image_from_bytes, process_image
+from my_utils.model import get_model, get_image_from_bytes, process_image, TTL
 from PIL import Image
 import uuid
 import asyncio
@@ -11,8 +11,10 @@ import my_utils.database as database
 from my_utils.data_models import *
 from typing import Dict, List
 from my_utils.exception_handlers import validation_exception_handler
+from my_utils.database import set_ttl_index
 
 model = get_model()
+set_ttl_index(TTL)
 
 app = FastAPI(
     title="Invian testovoe API",
@@ -50,13 +52,13 @@ async def get_bbox(task_id: str) -> JSONResponse:
         response['detail'] = 'Bbox for such ID not found. Check the correctness of the ID.'
     return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
     
-@app.get("/get_processed_image{task_id}")
+@app.get("/get_processed_image/{task_id}")
 async def get_processed_image(task_id: str) -> JSONResponse:
     image = database.get_processed_image(task_id)
     response = {'processedImage': image}
     if image is None:
         response['detail'] = 'Processed image for such ID not found. Check the correctness of the ID or status.'
-    return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)    
+    return response
 
 @app.get("/get_bbox_max/{task_id}", response_model=Dict[str, Bbox])
 async def get_bbox_max(task_id: str) -> JSONResponse:

@@ -3,12 +3,13 @@ from PIL import Image
 import io
 import json
 from my_utils.database import *
-from my_utils.config import MIN_TRESHHOLD
+from my_utils.config import MIN_TRESHHOLD, IOU
 
 def get_model():
     try:
         model = torch.hub.load('./yolov5', 'custom', path='./models/best.pt', source='local')
         model.conf = MIN_TRESHHOLD
+        model.iou = IOU
     except Exception as e:
         #TODO: process error
         pass
@@ -24,21 +25,27 @@ def get_image_from_bytes(binary_image, max_size=1024):
     ))
     return resized_image
 
+def get_processed_image_results(image):
+    image = Image.fromarray(image)
+    images_bytes = image.tobytes()
+    processed_image_params = {'processedImage': images_bytes, 'width': image.width, 'height': image.height}
+    return processed_image_params
+
 async def process_image(file, model, task_id):
     try:
         input_image = get_image_from_bytes(file)
         results = model(input_image)
-        #TODO: add valid values of bbox
         detect_res = results.pandas().xywhn[0].reset_index().to_dict(orient="records") #TODO: speed up, pandas is slow
         detect_res = [{key:value for key,value in one_box.items() if key not in ['class', 'name']} for one_box in detect_res] # delete class and name field from res dict
-        processed_image = results.render()[0].tobytes()
+        processed_image = results.render()[0]
+        processed_image_params = get_processed_image_results(processed_image)
         max_confidence_bbox = max(detect_res, key=lambda x: x['confidence'])
         if detect_res == []:
             #TODO: Add processing of empty result
             pass
         else:
             pass
-        add_processsing_results(task_id, detect_res, processed_image, max_confidence_bbox)
+        add_processsing_results(task_id, detect_res, processed_image_params, max_confidence_bbox)
     except Exception as e:
         #TODO: Process errors
         print(e)

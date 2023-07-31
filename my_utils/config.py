@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 #load env
 load_dotenv()
 
-#config params
-TTL = 0
+#model params
+TTL = 15
 MIN_TRESHHOLD = 0.2
-NMS = 0
+IOU = 0.2
 
 #database
 MONGODB_ADDON_USER = os.environ['MONGODB_ADDON_USER']
