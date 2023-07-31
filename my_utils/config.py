@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #model params
-TTL = 15
+TTL = 120 # seconds
 MIN_TRESHHOLD = 0.2
 IOU = 0.2
 

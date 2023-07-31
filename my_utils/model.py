@@ -25,13 +25,13 @@ def get_image_from_bytes(binary_image, max_size=1024):
     ))
     return resized_image
 
-def get_processed_image_results(image):
+def get_processed_image_results(image) -> dict:
     image = Image.fromarray(image)
     images_bytes = image.tobytes()
     processed_image_params = {'processedImage': images_bytes, 'width': image.width, 'height': image.height}
     return processed_image_params
 
-async def process_image(file, model, task_id):
+async def process_image(file, model, task_id) -> None:
     try:
         input_image = get_image_from_bytes(file)
         results = model(input_image)

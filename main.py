@@ -15,6 +15,7 @@ from my_utils.database import set_ttl_index
 
 model = get_model()
 set_ttl_index(TTL)
+# TODO: add semaphore as queue?
 
 app = FastAPI(
     title="Invian testovoe API",
@@ -74,7 +75,7 @@ async def task_processing(file: bytes = File(...)) -> JSONResponse:
     # TODO: add image validation process
     task_id = str(uuid.uuid4())
     try:
-        database.create_object(task_id, file)
+        database.create_object(task_id)
 # TODO: update task db: processing
         asyncio.create_task(process_image(file, model, task_id))
     except Exception as e:
