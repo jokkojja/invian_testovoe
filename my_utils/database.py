@@ -3,7 +3,6 @@ from my_utils.config import *
 def create_object(task_id, image):
     MYCOL.insert_one({
         'processId': task_id,
-        'originalImage': image,
         'status': 'queue',
         'processedImage': ''
         })
@@ -20,22 +19,30 @@ def add_processsing_results(task_id, results, processed_image, max_confidence_bb
                   'maxBbox': max_confidence_bbox}})
 
 def get_status_of_process(task_id):
-    status = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'status': 1}))[0]['status']
+    try:
+        status = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'status': 1}))[0]['status']
+    except (IndexError, KeyError):
+        status = None
     return status
 
 def get_bbox_of_process(task_id):
-    bbox = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'result': 1}))[0]['result']
+    try:
+        bbox = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'result': 1}))[0]['result']
+    except (IndexError, KeyError):
+        bbox = None
     return bbox
 
 def get_max_bbox(task_id):
-    bbox = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'maxBbox': 1}))[0]['maxBbox']
+    try:
+        bbox = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'maxBbox': 1}))[0]['maxBbox']
+    except (IndexError, KeyError):
+        bbox = None
     return bbox
 
-def get_picture(task_id):
-    image = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'originalImage': 1}))[0]['originalImage']
-    return image
-
 def get_processed_image(task_id):
-    image = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'processedImage': 1}))[0]['processedImage']
+    try:
+        image = list(MYCOL.find({'processId': task_id}, {'_id': 0, 'processedImage': 1}))[0]['processedImage']
+    except (IndexError, KeyError):
+        image = None
     return image    
 

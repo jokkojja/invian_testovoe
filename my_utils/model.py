@@ -30,6 +30,7 @@ async def process_image(file, model, task_id):
         results = model(input_image)
         #TODO: add valid values of bbox
         detect_res = results.pandas().xywhn[0].reset_index().to_dict(orient="records") #TODO: speed up, pandas is slow
+        detect_res = [{key:value for key,value in one_box.items() if key not in ['class', 'name']} for one_box in detect_res] # delete class and name field from res dict
         processed_image = results.render()[0].tobytes()
         max_confidence_bbox = max(detect_res, key=lambda x: x['confidence'])
         if detect_res == []:
@@ -40,6 +41,7 @@ async def process_image(file, model, task_id):
         add_processsing_results(task_id, detect_res, processed_image, max_confidence_bbox)
     except Exception as e:
         #TODO: Process errors
+        print(e)
         change_status(task_id, status='error')
         pass
     # update task: finished and coords of detecting
