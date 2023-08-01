@@ -58,13 +58,13 @@ async def get_status(task_id: str) -> JSONResponse:
 
 @app.get("/get_bbox/{task_id}", response_model=Dict[str, List[Bbox]])
 async def get_bbox(task_id: str) -> JSONResponse:
-    """ Get all bboxes by ID of task.
+    """ Get all bounding boxes by ID of task.
 
     Args:
         task_id (str): Id of task.
 
     Returns:
-        JSONResponse: Response with all bboxes of processed image or details if something went wrong.
+        JSONResponse: Response with all bounding boxes of processed image or details if something went wrong.
     """
     task_id = ObjectId(task_id)
     bbox = database.get_bbox_of_process(task_id)
@@ -75,13 +75,17 @@ async def get_bbox(task_id: str) -> JSONResponse:
     
 @app.get("/get_processed_image/{task_id}", response_model = Dict[str, ProcessedImage])
 async def get_processed_image(task_id: str) -> JSONResponse:
-    """ Get processed image with bboxes and confidence and also width, height and format of image.
-
+    """ Get processed image with bounding boxes and confidence, as well as width, height, and format of the image.
+    
+    To decode and show the image from the database, use:
+        decoded_image = base64.b64decode(response['processedImage'])
+        Image.open(io.BytesIO(decoded_image))
+        
     Args:
-        task_id (str): Id of task.
+        task_id (str): The ID of the task.
 
     Returns:
-        JSONResponse: Response with processed image or details if something went wrong.
+        JSONResponse: A response containing the processed image or details if something went wrong.
     """
     task_id = ObjectId(task_id)
     image = database.get_processed_image(task_id)
@@ -89,19 +93,16 @@ async def get_processed_image(task_id: str) -> JSONResponse:
     if image is None:
         response['detail'] = 'Processed image for such ID not found. Check the correctness of the ID or status.'
     return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
-# to decode and show image from db do:
-# decoded_image = base64.b64decode(new_image_string)
-# Image.open(io.BytesIO(decoded_image))
 
 @app.get("/get_bbox_max/{task_id}", response_model=Dict[str, Bbox])
 async def get_bbox_max(task_id: str) -> JSONResponse:
-    """ Get bbox with max confidence.
+    """ Get bounding boxes with max confidence.
 
     Args:
         task_id (str): Id of task.
 
     Returns:
-        JSONResponse: Response with bbox with max confidence or details if something went wrong.
+        JSONResponse: Response with bounding boxes with max confidence or details if something went wrong.
     """
     task_id = ObjectId(task_id)
     bbox = database.get_max_bbox(task_id)
