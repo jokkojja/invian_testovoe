@@ -1,8 +1,8 @@
 # Fire detection API. How to start
 1. git clone https://github.com/jokkojja/invian_testovoe.git
 2. cd invian_testovoe
-3. chmod +x run_api.sh
-4. ./run_api.sh
+3. chmod +x prepare.sh
+4. ./prepare.sh
 
 ## All ready to use API
 * to run all tests use command: python -m unittest discover -s tests
