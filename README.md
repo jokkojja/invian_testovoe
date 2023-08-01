@@ -1,4 +1,4 @@
-# invian_testovoe
+# Fire detection API. How to start
 1. git clone https://github.com/jokkojja/invian_testovoe.git
 2. cd invian_testovoe
 3. chmod +x run_api.sh
