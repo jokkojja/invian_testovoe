@@ -11,6 +11,9 @@ TTL = 1000000 # Time to live document in database (seconds)
 MIN_TRESHHOLD = 0.2 # Minimal thrashhold confidence
 IOU = 0.2 # Thrashhold NMS IOU
 
+#max count of concurrent tasks
+MAX_CONCURRENT_TASKS = 10
+
 #max size of image
 MAX_IMAGE_SIZE = 2048*2048
 

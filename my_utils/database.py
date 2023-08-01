@@ -1,7 +1,9 @@
 import datetime
 from typing import Union
-import my_utils.config as config
 
+from bson import ObjectId
+
+import my_utils.config as config
 
 def set_ttl_index(seconds: str) -> None:
     """ Set ttl index in database every time when API run.
@@ -16,27 +18,27 @@ def set_ttl_index(seconds: str) -> None:
         pass
     config.MYCOL.create_index("createdAt", expireAfterSeconds=config.TTL)
     
-def create_object(task_id: str) -> None:
-    """ Create document of task.
+def create_object() -> ObjectId:
+    """ Create task document in db.
 
-    Args:
-        task_id (str): Id of task.
+    Returns:
+        ObjectId: Id of task document.
     """
-    config.MYCOL.insert_one({
-        'processId': task_id,
+    inserted_result = config.MYCOL.insert_one({
         'status': 'queue',
         'processedImage': {},
         'createdAt': datetime.datetime.utcnow()
         })
+    return inserted_result.inserted_id
 
 def change_status(task_id: str, status: str = 'processing') -> None:
     """ Change status of task.
 
     Args:
-        task_id (str): Id of task.
+        task_id (str): Id of the task.
         status (str, optional): Status of task. Defaults to 'processing'.
     """
-    config.MYCOL.update_one({"processId": task_id}, 
+    config.MYCOL.update_one({"_id": task_id}, 
                      {'$set' : {'status' : status}}, upsert=True)
 
 
@@ -56,7 +58,7 @@ def add_processing_results(task_id: str, results: list,
     """
     change_status(task_id, status='completed')
     config.MYCOL.update_one(
-        {'processId': task_id},
+        {'_id': task_id},
         {"$set": {'processedImage': process_image_params, 'result': results,
                   'maxBbox': max_confidence_bbox}})
 
@@ -70,7 +72,7 @@ def get_status_of_process(task_id: str) -> Union[str, None]:
         Union[str, None]: Status of process. If process not found -> None
     """
     try:
-        status = list(config.MYCOL.find({'processId': task_id}, {'_id': 0, 'status': 1}))[0]['status']
+        status = list(config.MYCOL.find({'_id': task_id}, {'_id': 0, 'status': 1}))[0]['status']
     except (IndexError, KeyError):
         status = None
     return status
@@ -85,7 +87,7 @@ def get_bbox_of_process(task_id: str) -> Union[list, None]:
         Union[list, None]: Bbox of process. If bbox not found -> None
     """
     try:
-        bbox = list(config.MYCOL.find({'processId': task_id}, {'_id': 0, 'result': 1}))[0]['result']
+        bbox = list(config.MYCOL.find({'_id': task_id}, {'_id': 0, 'result': 1}))[0]['result']
     except (IndexError, KeyError):
         bbox = None
     return bbox
@@ -100,7 +102,7 @@ def get_max_bbox(task_id: str) -> Union[dict, None]:
         Union[dict, None]: Bbox with max confidence. If bbox not found -> None
     """
     try:
-        bbox = list(config.MYCOL.find({'processId': task_id}, {'_id': 0, 'maxBbox': 1}))[0]['maxBbox']
+        bbox = list(config.MYCOL.find({'_id': task_id}, {'_id': 0, 'maxBbox': 1}))[0]['maxBbox']
     except (IndexError, KeyError):
         bbox = None
     return bbox
@@ -115,7 +117,7 @@ def get_processed_image(task_id: str) -> Union[dict, None]:
         Union[dict, None]: Bbox with params. If not found -> None
     """
     try:
-        image = list(config.MYCOL.find({'processId': task_id}, {'_id': 0, 'processedImage': 1}))[0]['processedImage']
+        image = list(config.MYCOL.find({'_id': task_id}, {'_id': 0, 'processedImage': 1}))[0]['processedImage']
     except (IndexError, KeyError):
         image = None
     return image    

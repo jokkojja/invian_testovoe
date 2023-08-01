@@ -1,6 +1,7 @@
 import os
 import unittest
 
+from bson import ObjectId
 from fastapi.testclient import TestClient
 
 from main import app
@@ -12,7 +13,7 @@ class TestsGetProcessedImage(unittest.TestCase):
         self.maxDiff = None
             
     def test_get_processed_image_success(self):
-        task_id = "1fc39c76-d40d-47d2-852e-b212970e4610"
+        task_id = ObjectId("64c8c3ec90784e7e767dc7fb")
         response = self.client.get(f"/get_processed_image/{task_id}")
         with open(os.path.join('tests', 'test_data', 'test_processed_image.txt'), 'r') as file:
             excepted_img = file.read()
@@ -21,7 +22,7 @@ class TestsGetProcessedImage(unittest.TestCase):
         self.assertEqual(response.json(), excepted_data)
 
     def test_get_processed_image_not_found(self):
-        task_id = "abc123"
+        task_id = ObjectId("64c8c3ec90784e7e767dc7f1")
         response = self.client.get(f"/get_processed_image/{task_id}")
         excepted_data = {"result": None, "detail": "Processed image for such ID not found. Check the correctness of the ID or status."}
         self.assertEqual(response.status_code, 200)

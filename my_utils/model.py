@@ -66,6 +66,7 @@ async def process_image(file: bytes, model, task_id: str) -> None:
         task_id (str): Id of the task.
     """
     try:
+        database.change_status(task_id, status='processing')
         input_image = get_image_from_bytes(file)
         results = model(input_image)
         detect_res = results.pandas().xywhn[0].reset_index().to_dict(orient="records") #TODO: speed up, pandas is slow
@@ -73,11 +74,6 @@ async def process_image(file: bytes, model, task_id: str) -> None:
         processed_image = results.render()[0]
         processed_image_params = get_processed_image_results(processed_image)
         max_confidence_bbox = max(detect_res, key=lambda x: x['confidence'])
-        # if detect_res == []:
-        #     #TODO: Add processing of empty result
-        #     pass
-        # else:
-        #     pass
         database.add_processing_results(task_id, detect_res, processed_image_params, max_confidence_bbox)
     except Exception as e:
         database.change_status(task_id, status='error')

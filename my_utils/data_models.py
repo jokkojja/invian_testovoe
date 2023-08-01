@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 class Task(BaseModel):
-    id: str
+    taskId: str
     
 class Bbox(BaseModel):
     index: int
@@ -14,7 +14,7 @@ class Bbox(BaseModel):
     name: str    
 
 class Status(BaseModel):
-    id: str
+    taskId: str
     status: str
 
 class ProcessedImage(BaseModel):

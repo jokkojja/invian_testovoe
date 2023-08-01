@@ -1,1 +1,24 @@
-#TODO: Add req
+fastapi==0.100.1
+gitpython>=3.1.30
+httpx==0.24.1
+matplotlib>=3.3
+numpy>=1.18.5
+opencv-python>=4.1.1
+Pillow>=7.1.2
+psutil  # system resources
+pydantic==2.1.1
+pymongo==4.4.1
+python-dotenv==1.0.0
+python-magic==0.4.27
+python-magic-bin==0.4.14
+python-multipart==0.0.6
+PyYAML>=5.3.1
+requests>=2.23.0
+scipy>=1.4.1
+thop>=0.1.1  # FLOPs computation
+torch>=1.7.0  # see https://pytorch.org/get-started/locally (recommended)
+torchvision>=0.8.1
+tqdm>=4.64.0
+ultralytics>=8.0.111
+unittest2==1.1.0
+uvicorn==0.23.1

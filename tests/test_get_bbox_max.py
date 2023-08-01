@@ -1,5 +1,6 @@
 import unittest
 
+from bson import ObjectId
 from fastapi.testclient import TestClient
 
 from main import app
@@ -10,7 +11,7 @@ class TestsGetBboxMax(unittest.TestCase):
         self.client = TestClient(app)
         
     def test_get_bbox_max_success(self):
-        task_id = "1fc39c76-d40d-47d2-852e-b212970e4610"
+        task_id = ObjectId("64c8c3ec90784e7e767dc7fb")
         response = self.client.get(f"/get_bbox_max/{task_id}")
         excepted_data = {
                 "bbox": {
@@ -26,7 +27,7 @@ class TestsGetBboxMax(unittest.TestCase):
         self.assertEqual(response.json(), excepted_data)
 
     def test_get_bbox_max_not_found(self):
-        task_id = "abc123"
+        task_id = ObjectId("64c8c3ec90784e7e767dc7f1")
         response = self.client.get(f"/get_bbox_max/{task_id}")
         excepted_data = {"bbox": None, "detail": "Max bbox for such ID not found. Check the correctness of the ID or status."}
         self.assertEqual(response.status_code, 200)

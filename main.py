@@ -1,9 +1,9 @@
 import asyncio
-import uuid
 from typing import Dict, List
 
 import magic
 
+from bson import ObjectId
 from fastapi import FastAPI, File, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import HTTPException
@@ -17,7 +17,7 @@ from my_utils.model import get_model, process_image
 
 model = get_model() # upload model
 database.set_ttl_index(config.TTL) # set ttl index in database
-# TODO: add semaphore as queue?
+semaphore = asyncio.Semaphore(config.MAX_CONCURRENT_TASKS)
 
 app = FastAPI(
     title="Invian testovoe API",
@@ -49,8 +49,9 @@ async def get_status(task_id: str) -> JSONResponse:
     Returns:
         JSONResponse: Response with status of process or details if something went wrong.
     """
+    task_id = ObjectId(task_id)
     task_status = database.get_status_of_process(task_id)
-    response = {"id": task_id, "status": task_status}
+    response = {"id": str(task_id), "status": task_status}
     if task_status is None:
          response['detail'] = 'Status for such ID not found. Check the correctness of the ID.'
     return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
@@ -65,6 +66,7 @@ async def get_bbox(task_id: str) -> JSONResponse:
     Returns:
         JSONResponse: Response with all bboxes of processed image or details if something went wrong.
     """
+    task_id = ObjectId(task_id)
     bbox = database.get_bbox_of_process(task_id)
     response = {'bbox': bbox}
     if bbox is None:
@@ -81,6 +83,7 @@ async def get_processed_image(task_id: str) -> JSONResponse:
     Returns:
         JSONResponse: Response with processed image or details if something went wrong.
     """
+    task_id = ObjectId(task_id)
     image = database.get_processed_image(task_id)
     response = {'result': image}
     if image is None:
@@ -100,6 +103,7 @@ async def get_bbox_max(task_id: str) -> JSONResponse:
     Returns:
         JSONResponse: Response with bbox with max confidence or details if something went wrong.
     """
+    task_id = ObjectId(task_id)
     bbox = database.get_max_bbox(task_id)
     response = {'bbox': bbox}
     if bbox is None:
@@ -116,7 +120,6 @@ async def task_processing(file: bytes = File(...)) -> JSONResponse:
     Returns:
         JSONResponse: Id of process.
     """
-    # TODO: add task to queue and update status: in queue (DB)
     file_type = magic.from_buffer(file, mime=True)
     if not file_type.startswith('image/'):
         raise HTTPException(status_code=400, detail={"taskId": None, "error": "Invalid file type. Supports only images"}) # check type of file
@@ -124,13 +127,9 @@ async def task_processing(file: bytes = File(...)) -> JSONResponse:
     if len(file) > config.MAX_IMAGE_SIZE:
         raise HTTPException(status_code=400, detail={"taskId": None, "error": "Image file is too large"}) # check size of file
     
-    task_id = str(uuid.uuid4())
-    try:
-        database.create_object(task_id)
-# TODO: update task db: processing
+    task_id = database.create_object()
+    async with semaphore:
         asyncio.create_task(process_image(file, model, task_id))
-    except Exception as e:
-        response = {"errors": [e]}
-        return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_400_BAD_REQUEST)
-    response = {"taskId": task_id}
+
+    response = {"taskId": str(task_id)}
     return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
