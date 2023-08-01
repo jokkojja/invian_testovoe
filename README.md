@@ -21,4 +21,4 @@
 * to run all tests use command: python -m unittest discover -s tests
 
 * to run API use command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
-* documentation to the api is available at: http://0.0.0.0:8000/  docs#/, on Windows: http://127.0.0.1:8000/docs#/
+* documentation to the api is available at: http://0.0.0.0:8000/docs#/, on Windows: http://127.0.0.1:8000/docs#/
