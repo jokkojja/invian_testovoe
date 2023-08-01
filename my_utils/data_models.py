@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from fastapi import File
 
 class Task(BaseModel):
     id: str
@@ -15,7 +14,11 @@ class Bbox(BaseModel):
     name: str    
 
 class Status(BaseModel):
+    id: str
     status: str
 
 class ProcessedImage(BaseModel):
-    pass
+    processedImage: str
+    width: int
+    height: int
+    format: str

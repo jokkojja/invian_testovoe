@@ -4,8 +4,15 @@ import io
 import json
 from my_utils.database import *
 from my_utils.config import MIN_TRESHHOLD, IOU
+import base64
+import numpy as np
 
 def get_model():
+    """ Creates a yolov5 model instance
+
+    Returns:
+        models.common.Autoshape: yolov5 model with custom fire weights
+    """
     try:
         model = torch.hub.load('./yolov5', 'custom', path='./models/best.pt', source='local')
         model.conf = MIN_TRESHHOLD
@@ -15,7 +22,16 @@ def get_model():
         pass
     return model
 
-def get_image_from_bytes(binary_image, max_size=1024):
+def get_image_from_bytes(binary_image: bytes, max_size: int = 1024) -> Image.Image:
+    """_summary_
+
+    Args:
+        binary_image (bytes): _description_
+        max_size (int, optional): _description_. Defaults to 1024.
+
+    Returns:
+        Image.Image: _description_
+    """
     input_image = Image.open(io.BytesIO(binary_image)).convert("RGB")
     width, height = input_image.size
     resize_factor = min(max_size / width, max_size / height)
@@ -25,13 +41,30 @@ def get_image_from_bytes(binary_image, max_size=1024):
     ))
     return resized_image
 
-def get_processed_image_results(image) -> dict:
+def get_processed_image_results(image: np.array) -> dict:
+    """_summary_
+
+    Args:
+        image (np.array): _description_
+
+    Returns:
+        dict: _description_
+    """
     image = Image.fromarray(image)
-    images_bytes = image.tobytes()
-    processed_image_params = {'processedImage': images_bytes, 'width': image.width, 'height': image.height}
+    buff = io.BytesIO()
+    image.save(buff, format="JPEG")
+    new_image_string = base64.b64encode(buff.getvalue()).decode("utf-8")
+    processed_image_params = {'processedImage': new_image_string, 'width': image.width, 'height': image.height, 'format': 'base64'}
     return processed_image_params
 
-async def process_image(file, model, task_id) -> None:
+async def process_image(file: bytes, model, task_id: str) -> None:
+    """_summary_
+
+    Args:
+        file (bytes): _description_
+        model (_type_): _description_
+        task_id (str): _description_
+    """
     try:
         input_image = get_image_from_bytes(file)
         results = model(input_image)
@@ -47,8 +80,4 @@ async def process_image(file, model, task_id) -> None:
             pass
         add_processsing_results(task_id, detect_res, processed_image_params, max_confidence_bbox)
     except Exception as e:
-        #TODO: Process errors
-        print(e)
         change_status(task_id, status='error')
-        pass
-    # update task: finished and coords of detecting

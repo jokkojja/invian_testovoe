@@ -6,9 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #model params
-TTL = 120 # seconds
-MIN_TRESHHOLD = 0.2
-IOU = 0.2
+TTL = 1000000 # Time to live document in database (seconds)
+MIN_TRESHHOLD = 0.2 # Minimal thrashhold confidence
+IOU = 0.2 # Thrashhold NMS IOU
+
+#max size of image
+MAX_IMAGE_SIZE = 2048*2048
 
 #database
 MONGODB_ADDON_USER = os.environ['MONGODB_ADDON_USER']
