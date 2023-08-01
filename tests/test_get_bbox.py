@@ -8,34 +8,26 @@ class TestsGetBbox(unittest.TestCase):
         self.client = TestClient(app)    
             
     def test_get_bbox_success(self):
-        task_id = "253e5464-3a7c-40db-ad05-515d055d60a7"
+        task_id = "1fc39c76-d40d-47d2-852e-b212970e4610"
         response = self.client.get(f"/get_bbox/{task_id}")
         excepted_data = {
                 "bbox": [
                     {
                     "index": 0,
-                    "xcenter": 0.8432590961456299,
-                    "ycenter": 0.4610496163368225,
-                    "width": 0.04637223482131958,
-                    "height": 0.09011130779981613,
-                    "confidence": 0.32195380330085754
+                    "xcenter": 0.043890222907066345,
+                    "ycenter": 0.509705662727356,
+                    "width": 0.06866306066513062,
+                    "height": 0.11177687346935272,
+                    "confidence": 0.31698957085609436
                     },
                     {
                     "index": 1,
-                    "xcenter": 0.06623463332653046,
-                    "ycenter": 0.3004019856452942,
-                    "width": 0.1324692666530609,
-                    "height": 0.2746131122112274,
-                    "confidence": 0.3147033452987671
+                    "xcenter": 0.5942407846450806,
+                    "ycenter": 0.4952731728553772,
+                    "width": 0.07611769437789917,
+                    "height": 0.1260623037815094,
+                    "confidence": 0.26645925641059875
                     },
-                    {
-                    "index": 2,
-                    "xcenter": 0.6308906078338623,
-                    "ycenter": 0.3786800801753998,
-                    "width": 0.4489380717277527,
-                    "height": 0.2510313093662262,
-                    "confidence": 0.27342575788497925
-                    }
                 ]
             }
         self.assertEqual(response.status_code, 200)

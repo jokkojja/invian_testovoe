@@ -115,7 +115,6 @@ async def task_processing(file: bytes = File(...)) -> JSONResponse:
         JSONResponse: Id of process
     """
     # TODO: add task to queue and update status: in queue (DB)
-    # TODO: add image validation process
     file_type = magic.from_buffer(file, mime=True)
     if not file_type.startswith('image/'):
         raise HTTPException(status_code=400, detail={"taskId": None, "error": "Invalid file type. Supports only images"}) # check type of file

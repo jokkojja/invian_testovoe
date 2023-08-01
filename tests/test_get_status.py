@@ -9,7 +9,7 @@ class TestsGetStatus(unittest.TestCase):
         self.client = TestClient(app)
                 
     def test_get_status_success(self):
-        task_id = "253e5464-3a7c-40db-ad05-515d055d60a7"
+        task_id = "1fc39c76-d40d-47d2-852e-b212970e4610"
         response = self.client.get(f"/get_status/{task_id}")
         excepted_data = {"id": task_id, "status": "completed"}
         self.assertEqual(response.status_code, 200)

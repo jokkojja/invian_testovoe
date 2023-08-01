@@ -8,16 +8,16 @@ class TestsGetBboxMax(unittest.TestCase):
         self.client = TestClient(app)
         
     def test_get_bbox_max_success(self):
-        task_id = "253e5464-3a7c-40db-ad05-515d055d60a7"
+        task_id = "1fc39c76-d40d-47d2-852e-b212970e4610"
         response = self.client.get(f"/get_bbox_max/{task_id}")
         excepted_data = {
                 "bbox": {
                     "index": 0,
-                    "xcenter": 0.8432590961456299,
-                    "ycenter": 0.4610496163368225,
-                    "width": 0.04637223482131958,
-                    "height": 0.09011130779981613,
-                    "confidence": 0.32195380330085754
+                    "xcenter": 0.043890222907066345,
+                    "ycenter": 0.509705662727356,
+                    "width": 0.06866306066513062,
+                    "height": 0.11177687346935272,
+                    "confidence": 0.31698957085609436
                 }
             }
         self.assertEqual(response.status_code, 200)

@@ -78,6 +78,6 @@ async def process_image(file: bytes, model, task_id: str) -> None:
             pass
         else:
             pass
-        add_processsing_results(task_id, detect_res, processed_image_params, max_confidence_bbox)
+        add_processing_results(task_id, detect_res, processed_image_params, max_confidence_bbox)
     except Exception as e:
         change_status(task_id, status='error')

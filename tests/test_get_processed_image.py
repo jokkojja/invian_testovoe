@@ -10,11 +10,11 @@ class TestsGetProcessedImage(unittest.TestCase):
         self.maxDiff = None
             
     def test_get_processed_image_success(self):
-        task_id = "253e5464-3a7c-40db-ad05-515d055d60a7"
+        task_id = "1fc39c76-d40d-47d2-852e-b212970e4610"
         response = self.client.get(f"/get_processed_image/{task_id}")
         with open(os.path.join('tests', 'test_data', 'test_processed_image.txt'), 'r') as file:
             excepted_img = file.read()
-        excepted_data = {'result': {'processedImage': excepted_img,  'width': 1024, 'height': 576, 'format': 'base64'}}
+        excepted_data = {'result': {'processedImage': excepted_img,  'width': 1024, 'height': 640, 'format': 'base64'}}
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), excepted_data)
 
