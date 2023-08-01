@@ -4,6 +4,7 @@
 3. python3 -m venv testovoe.env
 4. source testovoe.env/bin/activate
 5. pip install -r requirements.txt
+6. move .env file into invian_testovoe
 
 * to run all tests use command: python -m unittest discover -s tests
 
