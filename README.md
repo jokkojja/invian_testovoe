@@ -22,3 +22,9 @@
 
 * to run API use command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
 * documentation to the api is available at: http://0.0.0.0:8000/docs#/, on Windows: http://127.0.0.1:8000/docs#/
+
+### Some examples:
+* http://0.0.0.0:8000/get_status/64c9128d039def21474f74e5
+* http://0.0.0.0:8000/get_bbox/64c9128d039def21474f74e5
+* http://0.0.0.0:8000/get_bbox_max/64c9128d039def21474f74e5
+* http://0.0.0.0:8000/get_processed_image/64c9128d039def21474f74e5
