@@ -1,36 +1,36 @@
-import torch
-from PIL import Image
-import io
-import json
-from my_utils.database import *
-from my_utils.config import MIN_TRESHHOLD, IOU
 import base64
+import io
+
 import numpy as np
+from PIL import Image
+import torch
+
+import my_utils.config as config
+import my_utils.database as database
 
 def get_model():
-    """ Creates a yolov5 model instance
+    """ Creates a yolov5 model instance.
 
     Returns:
-        models.common.Autoshape: yolov5 model with custom fire weights
+        models.common.Autoshape: yolov5 model with custom fire weights.
     """
     try:
         model = torch.hub.load('./yolov5', 'custom', path='./models/best.pt', source='local')
-        model.conf = MIN_TRESHHOLD
-        model.iou = IOU
+        model.conf = config.MIN_TRESHHOLD
+        model.iou = config.IOU
     except Exception as e:
-        #TODO: process error
         pass
     return model
 
 def get_image_from_bytes(binary_image: bytes, max_size: int = 1024) -> Image.Image:
-    """_summary_
+    """ Prepare image for yolov5 model.
 
     Args:
-        binary_image (bytes): _description_
-        max_size (int, optional): _description_. Defaults to 1024.
+        binary_image (bytes): Image.
+        max_size (int, optional): Max size if image. Defaults to 1024.
 
     Returns:
-        Image.Image: _description_
+        Image.Image: Image for yolov5 model.
     """
     input_image = Image.open(io.BytesIO(binary_image)).convert("RGB")
     width, height = input_image.size
@@ -42,13 +42,13 @@ def get_image_from_bytes(binary_image: bytes, max_size: int = 1024) -> Image.Ima
     return resized_image
 
 def get_processed_image_results(image: np.array) -> dict:
-    """_summary_
+    """ Prepare for storing in database.
 
     Args:
-        image (np.array): _description_
+        image (np.array): Image in np.array.
 
     Returns:
-        dict: _description_
+        dict: Image with params.
     """
     image = Image.fromarray(image)
     buff = io.BytesIO()
@@ -58,12 +58,12 @@ def get_processed_image_results(image: np.array) -> dict:
     return processed_image_params
 
 async def process_image(file: bytes, model, task_id: str) -> None:
-    """_summary_
+    """ Processing image using yolov5 model.
 
     Args:
-        file (bytes): _description_
-        model (_type_): _description_
-        task_id (str): _description_
+        file (bytes): Image for processing.
+        model (_type_): Model.
+        task_id (str): Id of the task.
     """
     try:
         input_image = get_image_from_bytes(file)
@@ -73,11 +73,11 @@ async def process_image(file: bytes, model, task_id: str) -> None:
         processed_image = results.render()[0]
         processed_image_params = get_processed_image_results(processed_image)
         max_confidence_bbox = max(detect_res, key=lambda x: x['confidence'])
-        if detect_res == []:
-            #TODO: Add processing of empty result
-            pass
-        else:
-            pass
-        add_processing_results(task_id, detect_res, processed_image_params, max_confidence_bbox)
+        # if detect_res == []:
+        #     #TODO: Add processing of empty result
+        #     pass
+        # else:
+        #     pass
+        database.add_processing_results(task_id, detect_res, processed_image_params, max_confidence_bbox)
     except Exception as e:
-        change_status(task_id, status='error')
+        database.change_status(task_id, status='error')
