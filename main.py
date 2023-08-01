@@ -83,7 +83,7 @@ async def get_processed_image(task_id: str) -> JSONResponse:
     response = {'result': image}
     if image is None:
         response['detail'] = 'Processed image for such ID not found. Check the correctness of the ID or status.'
-    return response
+    return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)
 # to decode and show image from db do:
 # decoded_image = base64.b64decode(new_image_string)
 # Image.open(io.BytesIO(decoded_image))
@@ -118,10 +118,10 @@ async def task_processing(file: bytes = File(...)) -> JSONResponse:
     # TODO: add image validation process
     file_type = magic.from_buffer(file, mime=True)
     if not file_type.startswith('image/'):
-        raise HTTPException(status_code=400, detail="Invalid file type. Supports only images") # check type of file
+        raise HTTPException(status_code=400, detail={"taskId": None, "error": "Invalid file type. Supports only images"}) # check type of file
     
     if len(file) > MAX_IMAGE_SIZE:
-        raise HTTPException(status_code=400, detail="Image file is too large") # check size of file
+        raise HTTPException(status_code=400, detail={"taskId": None, "error": "Image file is too large"}) # check size of file
     
     task_id = str(uuid.uuid4())
     try:
@@ -131,5 +131,5 @@ async def task_processing(file: bytes = File(...)) -> JSONResponse:
     except Exception as e:
         response = {"errors": [e]}
         return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_400_BAD_REQUEST)
-    response = {"task_id": task_id}
+    response = {"taskId": task_id}
     return JSONResponse(content=jsonable_encoder(response), status_code = status.HTTP_200_OK)

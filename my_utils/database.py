@@ -24,7 +24,7 @@ def change_status(task_id: str, status: str = 'processing') -> None:
 
 def add_processsing_results(task_id: str, results: list, 
                             process_image_params: dict, max_confidence_bbox: dict) -> None:
-    change_status(task_id, status='done')
+    change_status(task_id, status='completed')
     MYCOL.update_one(
         {'processId': task_id},
         {"$set": {'processedImage': process_image_params, 'result': results,

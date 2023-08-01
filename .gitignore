@@ -7,8 +7,7 @@ __pycache__/
 *.so
 
 #custom
-*.jpeg
-*.jpg
+.DS_Store
 
 # Distribution / packaging
 .Python
