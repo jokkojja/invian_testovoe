@@ -2,7 +2,7 @@ import unittest
 from fastapi.testclient import TestClient
 from main import app
 
-class TestsGetStatus(unittest.TestCase):
+class TestsGetBboxMax(unittest.TestCase):
         
     def setUp(self):
         self.client = TestClient(app)

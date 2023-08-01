@@ -3,7 +3,7 @@ import os
 from fastapi.testclient import TestClient
 from main import app
 
-class TestsGetStatus(unittest.TestCase):
+class TestsSendImage(unittest.TestCase):
     
     def setUp(self):
         self.client = TestClient(app)  
